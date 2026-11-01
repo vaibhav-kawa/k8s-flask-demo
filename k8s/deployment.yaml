@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-demo
+  labels:
+    app: flask-demo
+spec:
+  replicas: 3                      # 3 identical pods for availability
+  selector:
+    matchLabels:
+      app: flask-demo
+  template:
+    metadata:
+      labels:
+        app: flask-demo
+    spec:
+      containers:
+        - name: flask-demo
+          image: flask-demo:1.0
+          imagePullPolicy: IfNotPresent   # use the locally built image
+          ports:
+            - containerPort: 5000
+          env:
+            - name: APP_VERSION
+              value: "1.0"
+          resources:
+            requests:              # minimum guaranteed
+              cpu: "50m"
+              memory: "64Mi"
+            limits:                # maximum allowed
+              cpu: "200m"
+              memory: "128Mi"
+          readinessProbe:          # only send traffic when ready
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:           # restart the container if it hangs
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10

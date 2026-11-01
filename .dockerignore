@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.git
+.gitignore
+k8s/
+screenshots/
+*.md
+.venv/
